@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tap Rush - 60 Second Tap Race</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f4f4f4;
+      margin-top: 50px;
+    }
+    #tapButton {
+      font-size: 32px;
+      padding: 30px 60px;
+      background: #ff6b00;
+      border: none;
+      color: white;
+      border-radius: 10px;
+      display: none;
+    }
+    #startButton {
+      font-size: 28px;
+      padding: 20px 40px;
+      background: green;
+      color: white;
+      border: none;
+      border-radius: 10px;
+    }
+    #score {
+      font-size: 40px;
+      margin-top: 20px;
+    }
+    #timer {
+      font-size: 34px;
+      margin: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Tap Rush ⏱️</h1>
+  <h3>Tap as fast as you can for 60 seconds!</h3>
+
+  <div>
+    <input id="playerName" placeholder="Enter your name" style="font-size:20px; padding:10px;">
+  </div>
+
+  <button id="startButton" onclick="startGame()">Start Game</button>
+
+  <div id="timer"></div>
+  <div id="score"></div>
+
+  <button id="tapButton" onclick="tap()">TAP!</button>
+
+  <script>
+    let score = 0;
+    let timeLeft = 60;
+    let timerInterval;
+
+    function startGame() {
+      const name = document.getElementById("playerName").value.trim();
+      if (name === "") {
+        alert("Please enter your name.");
+        return;
+      }
+
+      score = 0;
+      timeLeft = 60;
+      document.getElementById("score").innerText = "Score: 0";
+      document.getElementById("timer").innerText = "Time: 60";
+
+      document.getElementById("startButton").style.display = "none";
+      document.getElementById("tapButton").style.display = "inline-block";
+
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function tap() {
+      score++;
+      document.getElementById("score").innerText = "Score: " + score;
+    }
+
+    function updateTimer() {
+      timeLeft--;
+      document.getElementById("timer").innerText = "Time: " + timeLeft;
+
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        document.getElementById("tapButton").style.display = "none";
+        submitScore();
+      }
+    }
+
+    function submitScore() {
+      const name = document.getElementById("playerName").value;
+
+      // SCORELEADER API SUBMISSION
+      fetch("https://scoreleader.com/api/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          board: "TAPRUSH12345",  // Your private leaderboard ID
+          name: name,
+          score: score
+        })
+      });
+
+      alert("Time's up! Your score: " + score);
+      document.getElementById("startButton").style.display = "inline-block";
+    }
+  </script>
+</body>
+</html>
